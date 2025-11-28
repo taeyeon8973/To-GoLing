@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>To-GoLing.app | Tap and Log Your Life</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="To-GoLing.app is an NFC keyring + app that lets you capture your feelings and locations with a single tap."
+  />
+  <link rel="canonical" href="https://to-goling.app" />
+  <style>
+    :root {
+      /* 메인 팔레트 – 프레젠테이션 느낌 */
+      --bg: #f5f2ea;          /* 전체 배경 – 아이보리 */
+      --bg-soft: #ffffff;      /* 카드/섹션 배경 */
+      --accent: #4f81bd;       /* 메인 파랑 */
+      --accent-soft: #e4edf7;  /* 파랑 연한 버전 */
+      --accent-strong: #f79646;/* 포인트 오렌지 */
+      --text-main: #1f2933;    /* 진한 글자 */
+      --text-sub: #6b7280;     /* 서브 텍스트 */
+      --border-soft: #e5e7eb;  /* 연한 테두리 */
+      --card-radius: 16px;
+      --shadow-soft: 0 12px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #ffffff 0, #f5f2ea 55%, #f1ede4 100%);
+      color: var(--text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 20px 18px 60px;
+    }
+
+    /* NAV */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 4px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.92),
+        rgba(255, 255, 255, 0.88),
+        transparent
+      );
+      border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-dot {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #ffffff, #4f81bd);
+      box-shadow: 0 0 16px rgba(79, 129, 189, 0.7);
+    }
+
+    .nav-title-main {
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+    }
+
+    .nav-title-sub {
+      font-size: 11px;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    .nav-links a {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      transition: all 0.18s ease;
+      cursor: pointer;
+    }
+
+    .nav-links a:hover {
+      border-color: var(--border-soft);
+      color: var(--accent);
+      background: rgba(228, 237, 247, 0.7);
+    }
+
+    /* HERO */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.4fr);
+      gap: 26px;
+      padding: 26px 4px 32px;
+      align-items: center;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 11px;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .hero-pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.7);
+    }
+
+    .hero-title {
+      font-size: clamp(32px, 4vw, 40px);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      color: #1f2933;
+    }
+
+    .hero-title span {
+      background: linear-gradient(120deg, #4f81bd, #f79646);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero-sub {
+      color: var(--text-sub);
+      font-size: 14px;
+      max-width: 520px;
+    }
+
+    .hero-cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 8px;
+      align-items: center;
+    }
+
+    .btn-primary {
+      padding: 9px 18px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, #f79646, #c0504d);
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(192, 80, 77, 0.35);
+      transition: transform 0.12s ease, box-shadow 0.12s ease,
+        filter 0.12s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+      box-shadow: 0 14px 30px rgba(192, 80, 77, 0.45);
+    }
+
+    .btn-ghost {
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text-sub);
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s ease;
+    }
+
+    .btn-ghost:hover {
+      color: var(--accent);
+      border-color: rgba(148, 163, 184, 0.9);
+      background: #ffffff;
+    }
+
+    .hero-cta-note {
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    .hero-right {
+      border-radius: 22px;
+      background: var(--bg-soft);
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-soft);
+      padding: 16px 16px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(228, 237, 247, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .hero-hardware {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    .ring-visual {
+      width: 104px;
+      height: 104px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #ffffff, #4f81bd);
+      box-shadow: 0 0 32px rgba(79, 129, 189, 0.6);
+      position: relative;
+    }
+
+    .ring-visual-inner {
+      position: absolute;
+      inset: 18px;
+      border-radius: 999px;
+      border: 2px solid rgba(148, 163, 184, 0.6);
+      background: radial-gradient(circle at 30% 30%, #f5f2ea, #ffffff);
+    }
+
+    .hero-hardware-text h3 {
+      font-size: 15px;
+      margin-bottom: 4px;
+      color: var(--accent);
+    }
+
+    .hero-hardware-text p {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .hero-tagline {
+      margin-top: 14px;
+      padding: 10px 10px;
+      border-radius: 14px;
+      background: var(--accent-soft);
+      border: 1px dashed rgba(148, 163, 184, 0.9);
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    .hero-tagline strong {
+      color: var(--accent-strong);
+    }
+
+    /* SECTIONS */
+    section {
+      margin-top: 32px;
+      padding: 0 4px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .section-title-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-end;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .section-sub {
+      font-size: 12px;
+      color: var(--text-sub);
+      max-width: 360px;
+      text-align: right;
+    }
+
+    .card-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      border-radius: var(--card-radius);
+      border: 1px solid var(--border-soft);
+      background: var(--bg-soft);
+      padding: 12px 13px 13px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card-header-label {
+      font-size: 11px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 6px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .card-body {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .card-list {
+      margin-top: 6px;
+      padding-left: 14px;
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .card-list li {
+      margin-bottom: 4px;
+    }
+
+    /* TIMELINE / FOOTER */
+    .timeline {
+      border-radius: var(--card-radius);
+      border: 1px solid var(--border-soft);
+      padding: 12px 14px;
+      background: var(--bg-soft);
+      box-shadow: var(--shadow-soft);
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .timeline-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .timeline-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .timeline-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-sub);
+    }
+
+    .footer {
+      margin-top: 36px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(209, 213, 219, 0.9);
+      font-size: 11px;
+      color: var(--text-sub);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .footer a {
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: 3px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 840px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .hero-right {
+        order: -1;
+      }
+
+      .card-grid-3 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .card-grid-2 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .section-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .section-sub {
+        text-align: left;
+      }
+
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- NAV -->
+    <header class="nav">
+      <div class="nav-left">
+        <div class="logo-dot"></div>
+        <div>
+          <div class="nav-title-main">To-GoLing</div>
+          <div class="nav-title-sub">to-goling.app • Team 12V</div>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="#problem">Problem</a>
+        <a href="#solution">Product</a>
+        <a href="#how-it-works">How it Works</a>
+        <a href="#about">About</a>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <main>
+      <section class="hero">
+        <div class="hero-left">
+          <div class="hero-pill">
+            <span class="hero-pill-dot"></span>
+            Location-based life log • NFC keyring
+          </div>
+          <h1 class="hero-title">
+            Tap once.<br />
+            <span>Capture the moment</span> before it disappears.
+          </h1>
+          <p class="hero-sub">
+            To-GoLing.app connects a physical NFC keyring with a smart diary app.
+            Tag your phone, and we instantly turn your current place, time, and
+            feelings into a tiny story – without breaking your flow.
+          </p>
+          <div class="hero-cta-row">
+            <button class="btn-primary" onclick="document.getElementById('solution').scrollIntoView({behavior:'smooth'})">
+              See how it works →
+            </button>
+            <button class="btn-ghost" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">
+              Learn about Team 12V
+              <span>☆</span>
+            </button>
+            <div class="hero-cta-note">
+              Prototype project • hosted at to-goling.app
+            </div>
+          </div>
+        </div>
+
+        <aside class="hero-right">
+          <div class="hero-badge">Prototype Preview</div>
+
+          <div class="hero-hardware">
+            <div class="ring-visual">
+              <div class="ring-visual-inner"></div>
+            </div>
+            <div class="hero-hardware-text">
+              <h3>To-GoLing NFC Keyring</h3>
+              <p>
+                A small, always-with-you keyring that becomes your “record”
+                button. Tap on your phone to start a mini diary in seconds.
+              </p>
+            </div>
+          </div>
+
+          <div class="hero-tagline">
+            <strong>From friction to flow.</strong>
+            Digital diaries are often opened too late – when the feelings have
+            already faded. We remove the unlock–open–type friction and keep the
+            emotion of “right now”.
+          </div>
+        </aside>
+      </section>
+
+      <!-- PROBLEM -->
+      <section id="problem">
+        <div class="section-label">Problem</div>
+        <div class="section-title-row">
+          <h2 class="section-title">Why we built To-GoLing</h2>
+          <p class="section-sub">
+            Modern life moves fast. By the time you open your notes app at home,
+            the vivid feeling from that café, river, or bus ride is gone.
+          </p>
+        </div>
+
+        <div class="card-grid-3">
+          <article class="card">
+            <div class="card-header-label">Friction</div>
+            <h3 class="card-title">Too many steps to record</h3>
+            <p class="card-body">
+              Unlock phone → find app → open → type.  
+              That tiny delay is enough for people to give up recording their day.
+            </p>
+          </article>
+          <article class="card">
+            <div class="card-header-label">Emotion</div>
+            <h3 class="card-title">Feelings fade quickly</h3>
+            <p class="card-body">
+              “I’ll write about it later” turns into “I don’t remember exactly”.
+              Precious moments are lost or flattened into generic text.
+            </p>
+          </article>
+          <article class="card">
+            <div class="card-header-label">Context</div>
+            <h3 class="card-title">Location is missing</h3>
+            <p class="card-body">
+              Traditional diaries rarely connect feelings with concrete places,
+              routes, and real-world context – even though those matter.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- SOLUTION / PRODUCT -->
+      <section id="solution">
+        <div class="section-label">Solution</div>
+        <div class="section-title-row">
+          <h2 class="section-title">A diary that starts with a tap</h2>
+          <p class="section-sub">
+            To-GoLing combines a physical NFC keyring (“To-GoRing”) with an
+            intelligent app (“To-Go”) to turn your everyday movement into an
+            effortless life log.
+          </p>
+        </div>
+
+        <div class="card-grid-2">
+          <article class="card">
+            <div class="card-header-label">Hardware</div>
+            <h3 class="card-title">To-GoRing: emotional NFC keyring</h3>
+            <p class="card-body">
+              Attach it to your bag, keys, or AirPods. The keyring acts as your
+              record trigger – a tiny ritual that feels analog and warm.
+            </p>
+            <ul class="card-list">
+              <li>NFC-based trigger to open the app</li>
+              <li>Always on you, zero extra steps</li>
+              <li>Designed as a fashion item, not a gadget</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <div class="card-header-label">Software</div>
+            <h3 class="card-title">To-Go: context-aware diary app</h3>
+            <p class="card-body">
+              The app turns your tap into a structured micro-entry with location,
+              time, and guiding questions – no blank page anxiety.
+            </p>
+            <ul class="card-list">
+              <li>Auto-captures place &amp; weather</li>
+              <li>AI prompts tailored to your location</li>
+              <li>Map &amp; feed view of your day</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <!-- HOW IT WORKS -->
+      <section id="how-it-works">
+        <div class="section-label">Flow</div>
+        <div class="section-title-row">
+          <h2 class="section-title">How it works in 3 steps</h2>
+          <p class="section-sub">
+            We keep your life’s flow intact. Recording should feel like a
+            heartbeat, not homework.
+          </p>
+        </div>
+
+        <div class="card-grid-3">
+          <article class="card">
+            <div class="card-header-label">Step 1</div>
+            <h3 class="card-title">Tap the keyring</h3>
+            <p class="card-body">
+              When you feel something worth remembering, simply tap the
+              To-GoRing on your phone – wherever you are.
+            </p>
+          </article>
+          <article class="card">
+            <div class="card-header-label">Step 2</div>
+            <h3 class="card-title">Answer a tiny question</h3>
+            <p class="card-body">
+              The app opens with a short, location-based question like
+              “You’re at the river. What song are you listening to?”
+            </p>
+          </article>
+          <article class="card">
+            <div class="card-header-label">Step 3</div>
+            <h3 class="card-title">See your day as a map</h3>
+            <p class="card-body">
+              Entries appear on both a feed and a map. Later, you can revisit
+              not just what you felt, but where you felt it.
+            </p>
+          </article>
+        </div>
+
+        <div style="margin-top: 18px;">
+          <div class="card">
+            <div class="card-header-label">Extra</div>
+            <h3 class="card-title">To-Go List: location-based to-do</h3>
+            <p class="card-body">
+              You can set “to-go” tasks that only complete when you actually
+              visit the place and tap your keyring.<br />
+              Example: “Arrive at the library by 10:00.” When you get there and
+              tag, you get a small celebration and character XP.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABOUT / TEAM -->
+      <section id="about">
+        <div class="section-label">Team</div>
+        <div class="section-title-row">
+          <h2 class="section-title">About Team 12V</h2>
+          <p class="section-sub">
+            To-GoLing is a one-time university project exploring how hardware
+            and software can blend into a more human way of recording life.
+          </p>
+        </div>
+
+        <div class="card-grid-2">
+          <article class="card">
+            <div class="card-header-label">Project Scope</div>
+            <h3 class="card-title">Prototype, not a startup (yet)</h3>
+            <p class="card-body">
+              This version of To-GoLing is a proof-of-concept focused on:
+            </p>
+            <ul class="card-list">
+              <li>NFC keyring prototype design</li>
+              <li>Core app UX &amp; interaction flow</li>
+              <li>Early user feedback &amp; demo</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <div class="card-header-label">Vision</div>
+            <h3 class="card-title">From diary to life log</h3>
+            <p class="card-body">
+              We see a world where diaries are alive with places, routes, and
+              honest moments – not just text written before bed.
+            </p>
+          </article>
+        </div>
+
+        <div style="margin-top: 16px;">
+          <div class="timeline">
+            <div class="timeline-label">Project timeline</div>
+            <div class="timeline-row">
+              <div class="timeline-dot"></div>
+              <div>
+                <strong>Phase 1 – Research &amp; Ideation:</strong>
+                interviews with digital diary users and analysis of “friction”
+                in recording.
+              </div>
+            </div>
+            <div class="timeline-row">
+              <div class="timeline-dot"></div>
+              <div>
+                <strong>Phase 2 – Prototype:</strong>
+                NFC keyring mock-up, app flow, and early tests of “tap to log”.
+              </div>
+            </div>
+            <div class="timeline-row">
+              <div class="timeline-dot"></div>
+              <div>
+                <strong>Phase 3 – Demo:</strong>
+                in-class presentation, user feedback, and reflection on what
+                worked – and what to try next.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div>© To-GoLing · Team 12V · to-goling.app</div>
+      <div>
+        Contact:
+        <a href="mailto:hello@to-goling.app">hello@to-goling.app</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // JS는 지금 구조 그대로 두면 돼요.
+  </script>
+</body>
+</html>
