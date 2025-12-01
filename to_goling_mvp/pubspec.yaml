@@ -1,0 +1,35 @@
+name: to_goling_mvp
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # iOS 스타일 아이콘
+  cupertino_icons: ^1.0.8
+
+  # 📍 위치 서비스 (Geolocator)
+  geolocator: ^13.0.1
+
+  # 💾 로컬 저장소 (SharedPreferences)
+  shared_preferences: ^2.2.3
+
+  # 📲 NFC 읽기 (MVP에서는 기본 비활성)
+  nfc_manager: ^3.3.0
+  flutter_map: ^8.2.2
+  latlong2: ^0.9.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
