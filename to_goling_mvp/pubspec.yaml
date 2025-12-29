@@ -21,7 +21,7 @@ dependencies:
   shared_preferences: ^2.2.3
 
   # 📲 NFC 읽기 (MVP에서는 기본 비활성)
-  nfc_manager: ^3.3.0
+  nfc_manager: ^4.1.1
   flutter_map: ^8.2.2
   latlong2: ^0.9.1
 
