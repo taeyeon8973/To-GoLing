@@ -24,6 +24,7 @@ dependencies:
   nfc_manager: ^4.1.1
   flutter_map: ^8.2.2
   latlong2: ^0.9.1
+  app_links: ^7.0.0
 
 dev_dependencies:
   flutter_test:
