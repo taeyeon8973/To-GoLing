@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:app_links/app_links.dart';
+import 'package:app_links/app_links.dart'; // 딥링크 패키지
 import 'services/log_repository.dart';
 import 'screens/new_log_screen.dart';
 import 'screens/log_detail_screen.dart';
 import 'models/log_entry.dart';
-import 'screens/main_shell.dart';
+import 'screens/splash_screen.dart';
+import 'screens/main_shell.dart'; // 메인 쉘 import
 
 void main() {
   runApp(const ToGoLingApp());
 }
 
+// 딥링크 감지를 위해 StatefulWidget으로 변경
 class ToGoLingApp extends StatefulWidget {
   const ToGoLingApp({super.key});
 
@@ -27,49 +29,39 @@ class _ToGoLingAppState extends State<ToGoLingApp> {
     _initDeepLinks();
   }
 
+  // 딥링크(NFC) 초기화 로직
   void _initDeepLinks() async {
     _appLinks = AppLinks();
-    
-    // [확인용] 함수가 실행되었는지 무조건 출력
-    print("👀 딥링크 감지 함수 시작됨 (_initDeepLinks)");
 
-    // 1. 스트림 리스너 먼저 등록 (놓치지 않기 위해)
-    _appLinks.uriLinkStream.listen((uri) {
-      print("⚡ [스트림 감지] 주소 들어옴: $uri");
-      _handleLink(uri);
-    }, onError: (err) {
-      print("❌ [에러] 스트림 에러: $err");
-    });
-
-    // 2. 앱이 꺼져있을 때 들어온 주소 확인
+    // 1. 앱이 꺼져있을 때 NFC로 켠 경우
     try {
       final Uri? initialUri = await _appLinks.getInitialLink();
-      print("🚀 [초기값 확인] getInitialLink 결과: $initialUri");
-      
       if (initialUri != null) {
         _handleLink(initialUri);
       }
     } catch (e) {
-      print("⚠️ 초기값 확인 중 에러: $e");
+      debugPrint("초기 링크 에러: $e");
     }
+
+    // 2. 앱이 켜져있을 때 NFC 태그한 경우 (스트림 리스너)
+    _appLinks.uriLinkStream.listen((uri) {
+      _handleLink(uri);
+    });
   }
 
+  // 링크 처리 함수
   void _handleLink(Uri uri) {
-    print("🧐 주소 분석 중... Scheme: ${uri.scheme}, Host: ${uri.host}");
-
     if (uri.scheme == 'togoling' && uri.host == 'new') {
-      print("✅ [성공] 조건 일치! 0.5초 뒤 이동합니다.");
-      
+      // 0.5초 딜레이 (앱 초기화 대기)
       Future.delayed(const Duration(milliseconds: 500), () {
-        if (_navigatorKey.currentState != null) {
-          _navigatorKey.currentState!.pushNamed('/new');
-          print("🏃 이동 명령 실행 완료");
-        } else {
-          print("❌ 네비게이터가 아직 준비되지 않음");
-        }
+        // 현재 화면 스택을 다 비우고 메인(Home)을 먼저 깔고, 그 위에 New를 얹음
+        // 이렇게 해야 NewLogScreen에서 뒤로가기 했을 때 메인 화면이 나옴
+        _navigatorKey.currentState?.pushNamedAndRemoveUntil(
+          '/home', 
+          (route) => false, 
+        );
+        _navigatorKey.currentState?.pushNamed('/new');
       });
-    } else {
-      print("❌ 조건 불일치 (내 주소가 아님)");
     }
   }
 
@@ -78,15 +70,34 @@ class _ToGoLingAppState extends State<ToGoLingApp> {
     final logRepository = LogRepository();
 
     return MaterialApp(
-      navigatorKey: _navigatorKey, // 키 연결 필수
+      navigatorKey: _navigatorKey, // 네비게이터 키 등록 필수
       title: 'To-GoLing',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        colorSchemeSeed: const Color(0xFF111827),
-        fontFamily: 'Apple SD Gothic Neo',
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: const Color(0xFFF7F6F2),
+        fontFamily: 'BlackHanSans', 
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF0B0F19),
+          background: const Color(0xFFF7F6F2),
+          surface: Colors.white,
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFFF7F6F2),
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          centerTitle: true,
+          titleTextStyle: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF0B0F19),
+          ),
+        ),
       ),
       routes: {
-        '/': (context) => MainShell(logRepository: logRepository),
+        '/': (context) => SplashScreen(logRepository: logRepository),
+        '/home': (context) => MainShell(logRepository: logRepository), // 메인 화면 연결
         '/new': (context) => NewLogScreen(logRepository: logRepository),
       },
       onGenerateRoute: (settings) {

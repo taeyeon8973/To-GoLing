@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../ui/tg_style.dart';
 
 class TabDiscoverScreen extends StatelessWidget {
   const TabDiscoverScreen({super.key});
@@ -6,126 +7,221 @@ class TabDiscoverScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
+      backgroundColor: TG.bg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F7FB),
-        elevation: 0,
-        title: const Text('루틴 · 발견 · 트렌드'),
-        centerTitle: true,
+        title: const Text('🔥 Challenges · 👀 Discover · Trends'),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
-            'Seoul 지역 챌린지',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          _SearchPill(),
+          const SizedBox(height: 16),
+
+          _SectionTitle('🔥 Challenges Near You (Stanford)'),
+          const SizedBox(height: 10),
+          _ChallengeCard(
+            title: '#skypic',
+            subtitle: 'Capture a photo of your day',
+            point: 20,
+          ),
+          const SizedBox(height: 10),
+          _ChallengeCard(
+            title: '#nicecoffee',
+            subtitle: 'Keep track of cool drinks',
+            point: 10,
+          ),
+
+          const SizedBox(height: 22),
+          _SectionTitle('AI-curated articles for you'),
+          const SizedBox(height: 10),
+          _ArticleCard(
+            title: 'Where are people in their 20s gathering in San Francisco today?',
+            snippet: 'Cafe and campus uploads spike. Peak around 5 PM.',
+            imageUrl: 'https://picsum.photos/seed/tg1/900/600',
           ),
           const SizedBox(height: 12),
-          _challengeChip(title: '#하늘사진', subtitle: '오늘 하늘 한 컷', point: 20),
-          const SizedBox(height: 8),
-          _challengeChip(title: '#동네산책', subtitle: '가까운 골목 기록', point: 10),
-          const SizedBox(height: 24),
-          const Text(
-            'AI 큐레이션 기사',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 12),
-          _articleCard(
-            title: '오늘 Seoul 20대는 어디에 모였나?',
-            snippet: '카페·학교 주변 업로드 급증. 오후 5시 피크.',
-          ),
-          const SizedBox(height: 12),
-          _articleCard(
-            title: '비 오는 날 인기 장소 3',
-            snippet: '지하 쇼핑몰·도서관·전시장 트렌드 분석.',
+          _ArticleCard(
+            title: 'Top 3 popular places on rainy days',
+            snippet: 'Underground malls, libraries, and exhibitions trend.',
+            imageUrl: 'https://picsum.photos/seed/tg2/900/600',
           ),
         ],
       ),
     );
   }
+}
 
-    Widget _challengeChip({
-    required String title,
-    required String subtitle,
-    required int point,
-  }) {
+class _SearchPill extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     return Container(
+      decoration: TG.glassCard(radius: 999),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+      child: Row(
+        children: const [
+          Icon(Icons.search, color: Colors.black45),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Search places / people / vibes',
+              style: TextStyle(color: Colors.black45, fontSize: 13),
+            ),
+          ),
+          Icon(Icons.auto_awesome, color: Color(0xFF7AA7FF)),
+        ],
       ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String text;
+  const _SectionTitle(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w800,
+        color: TG.ink,
+      ),
+    );
+  }
+}
+
+class _ChallengeCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final int point;
+
+  const _ChallengeCard({
+    required this.title,
+    required this.subtitle,
+    required this.point,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: TG.glassCard(),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       child: Row(
         children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [TG.neonBlue, TG.neonPink],
+              ),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(Icons.local_fire_department, color: Colors.white),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
+                  style: const TextStyle(fontSize: 12, color: Colors.black54),
                 ),
               ],
             ),
           ),
           Text(
-            '+${point}p',   // ← 요 줄만 point로!
-            style: const TextStyle(fontSize: 12),
+            '+$point pts',
+            style: const TextStyle(fontSize: 12, color: Colors.black54),
           ),
           const SizedBox(width: 8),
-          FilledButton.tonal(
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: TG.ink,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(999),
+              ),
+            ),
             onPressed: () {},
-            child: const Text('참여', style: TextStyle(fontSize: 12)),
+            child: const Text(
+              'Join',
+              style: TextStyle(fontSize: 12),
+            ),
           ),
         ],
       ),
     );
   }
+}
 
+class _ArticleCard extends StatelessWidget {
+  final String title;
+  final String snippet;
+  final String imageUrl;
 
-  Widget _articleCard({required String title, required String snippet}) {
+  const _ArticleCard({
+    required this.title,
+    required this.snippet,
+    required this.imageUrl,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-      ),
+      decoration: TG.glassCard(),
+      clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Image.network(imageUrl, fit: BoxFit.cover),
           ),
-          const SizedBox(height: 6),
-          Text(
-            snippet,
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              FilledButton.tonal(
-                onPressed: () {},
-                child: const Text('트렌드', style: TextStyle(fontSize: 12)),
-              ),
-              const SizedBox(width: 8),
-              TextButton(
-                onPressed: () {},
-                child: const Text('보기', style: TextStyle(fontSize: 12)),
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  snippet,
+                  style: const TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    FilledButton.tonal(
+                      onPressed: () {},
+                      child: const Text(
+                        'Trend',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () {},
+                      child: const Text(
+                        'View',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
